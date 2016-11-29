@@ -7,7 +7,7 @@ import (
 
 // Wrap wraps a connection and adds snappy compression on reading and writing.
 func Wrap(wrapped net.Conn) net.Conn {
-	return &snappyconn{wrapped, snappy.NewReader(wrapped), snappy.NewBufferedWriter(wrapped)}
+	return &snappyconn{wrapped, snappy.NewReader(wrapped), snappy.NewWriter(wrapped)}
 }
 
 type snappyconn struct {
@@ -21,9 +21,5 @@ func (c *snappyconn) Read(b []byte) (n int, err error) {
 }
 
 func (c *snappyconn) Write(b []byte) (n int, err error) {
-	n, err = c.w.Write(b)
-	if err == nil {
-		err = c.w.Flush()
-	}
-	return n, err
+	return c.w.Write(b)
 }
